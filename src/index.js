@@ -3,9 +3,13 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 function Square(props) {
+  let value;
+  if (!props.winner) value = props.value;
+  else value = <span className="winner">{ props.value }</span>
+
   return (
     <button className="square" onClick={ props.onClick }>
-      { props.value }
+      { value }
     </button>
   );
 }
@@ -16,6 +20,7 @@ class Board extends React.Component {
     return (
       <Square 
         key={ String(i) }
+        winner={ this.props.winner.includes(i) }
         value={ this.props.squares[i] }
         onClick={ () => this.props.onClick(i) }
       />
@@ -66,7 +71,7 @@ class Game extends React.Component {
     const squares = current.squares.slice();
     const lastCoordinates = getLastCoordinates(i);
     
-    if (calculateWinner(squares) || squares[i]) return;
+    if (calculateWinner(squares)[0] >= 0 || squares[i]) return;
 
     squares[i] = this.state.xIsNext ? 'X' : 'O';
     this.setState({ 
@@ -123,8 +128,8 @@ class Game extends React.Component {
     const moves = this.CreateHistoryNav(history, stepNumber);
 
     let status;
-    if (winner) {
-      status = 'Winner: ' + winner;
+    if (winner[0] >= 0) {
+      status = 'Winner: ' + current.squares[winner[0]];
     } else {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
     }
@@ -132,6 +137,7 @@ class Game extends React.Component {
       <div className="game">
         <div className="game-board">
           <Board 
+            winner={ winner }
             squares={ current.squares }
             onClick={ i => this.handleClick(i) }
           />
@@ -168,10 +174,10 @@ function calculateWinner(squares) {
 
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
-    if ( squares[a] && squares[a] === squares[b] && squares[a] === squares[c] ) return squares[a];
+    if ( squares[a] && squares[a] === squares[b] && squares[a] === squares[c] ) return [a, b, c];
   }
 
-  return null;
+  return [-1, -1, -1];
 }
 
 function getLastCoordinates(i) {
