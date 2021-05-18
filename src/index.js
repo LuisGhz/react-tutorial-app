@@ -53,6 +53,7 @@ class Game extends React.Component {
       history: [{ 
         squares: Array(9).fill(null)
       }],
+      coordinatesHistory: Array(9).fill(null),
       stepNumber: 0,
       xIsNext: true,
     }
@@ -60,8 +61,11 @@ class Game extends React.Component {
 
   handleClick(i) {
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
+    const coordinatesHistory = this.state.coordinatesHistory.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
+    const lastCoordinates = getLastCoordinates(i);
+    
     if (calculateWinner(squares) || squares[i]) return;
 
     squares[i] = this.state.xIsNext ? 'X' : 'O';
@@ -69,9 +73,10 @@ class Game extends React.Component {
       history: history.concat([{
         squares: squares
       }]),
+      coordinatesHistory: coordinatesHistory.concat(lastCoordinates),
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext
-    })
+    });
   }
 
   jumpTo(step) {
@@ -82,9 +87,14 @@ class Game extends React.Component {
   }
 
   render() {
+    const stepNumber = this.state.stepNumber;
     const history = this.state.history;
-    const current = history[this.state.stepNumber];
+    const current = history[stepNumber];
     const winner = calculateWinner(current.squares);
+
+    const currentCoordinates = this.state.coordinatesHistory[stepNumber] ?
+      `Last move in column: ${ this.state.coordinatesHistory[stepNumber].column } and row: ${ this.state.coordinatesHistory[stepNumber].row }` :
+      '';
 
     const moves = history.map((step, move) => {
       const desc = move ?
@@ -113,6 +123,7 @@ class Game extends React.Component {
           />
         </div>
         <div className="game-info">
+          <div>{ currentCoordinates }</div>
           <div>{ status }</div>
           <ol>{ moves }</ol>
         </div>
@@ -146,4 +157,20 @@ function calculateWinner(squares) {
   }
 
   return null;
+}
+
+function getLastCoordinates(i) {
+  const coordinates = new Map();
+
+  coordinates.set(0, { row: 1, column: 1 });
+  coordinates.set(1, { row: 1, column: 2 });
+  coordinates.set(2, { row: 1, column: 3 });
+  coordinates.set(3, { row: 2, column: 1 });
+  coordinates.set(4, { row: 2, column: 2 });
+  coordinates.set(5, { row: 2, column: 3 });
+  coordinates.set(6, { row: 3, column: 1 });
+  coordinates.set(7, { row: 3, column: 2 });
+  coordinates.set(8, { row: 3, column: 3 });
+
+  return coordinates.get(i);
 }
