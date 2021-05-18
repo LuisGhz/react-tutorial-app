@@ -54,6 +54,7 @@ class Game extends React.Component {
       coordinatesHistory: Array(9).fill(null),
       stepNumber: 0,
       xIsNext: true,
+      isHistoryReverse: false
     }
   }
 
@@ -84,6 +85,30 @@ class Game extends React.Component {
     })
   }
 
+  CreateHistoryNav(history, stepNumber) {
+    const moves = history.map((step, move) => {
+      const desc = move ?
+        `Go to move #${move}` :
+        `Go to game start`;
+
+      return (
+        <li key={ move } >
+          <button className={ move === stepNumber ? 'bold-button' : null } onClick={ () => this.jumpTo(move) }>{ desc }</button>
+        </li>
+      );
+    });
+
+    if (this.state.isHistoryReverse) moves.reverse();
+
+    return moves;
+  }
+
+  ReverseHistory() {
+    this.setState({
+      isHistoryReverse: !this.state.isHistoryReverse
+    });
+  }
+
   render() {
     const stepNumber = this.state.stepNumber;
     const history = this.state.history;
@@ -94,17 +119,7 @@ class Game extends React.Component {
       `Last move in column: ${ this.state.coordinatesHistory[stepNumber].column } and row: ${ this.state.coordinatesHistory[stepNumber].row }` :
       '';
 
-    const moves = history.map((step, move) => {
-      const desc = move ?
-        `Go to move #${move}` :
-        `Go to game start`;
-
-      return (
-        <li key={ move } >
-          <button className={ move === this.state.stepNumber ? 'bold-button' : null } onClick={ () => this.jumpTo(move) }>{ desc }</button>
-        </li>
-      );
-    });
+    const moves = this.CreateHistoryNav(history, stepNumber);
 
     let status;
     if (winner) {
@@ -123,6 +138,7 @@ class Game extends React.Component {
         <div className="game-info">
           <div>{ currentCoordinates }</div>
           <div>{ status }</div>
+          <div><button onClick={ () => this.ReverseHistory() } >Reverse history</button></div>
           <ol>{ moves }</ol>
         </div>
       </div>
