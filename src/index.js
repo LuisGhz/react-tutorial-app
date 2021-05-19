@@ -128,11 +128,12 @@ class Game extends React.Component {
     const moves = this.CreateHistoryNav(history, stepNumber);
 
     let status;
-    if (winner[0] >= 0) {
-      status = 'Winner: ' + current.squares[winner[0]];
-    } else {
-      status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
-    }
+    if (winner[0] === -1) status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+    if (history.length === 10 && (stepNumber + 1) === history.length) status = <b>Nobody wins =(</b>
+    if (winner[0] >= 0) status = <b>Winner: { current.squares[winner[0]] }</b>
+
+
+
     return (
       <div className="game">
         <div className="game-board">
