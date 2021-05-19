@@ -1,3 +1,5 @@
+import './index.css';
+
 export function Square(props) {
   let value;
   if (!props.winner) value = props.value;
