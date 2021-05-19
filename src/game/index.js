@@ -1,5 +1,6 @@
 import React from 'react';
 import { Board } from '../board/index';
+import './index.css';
 
 export class Game extends React.Component {
 
